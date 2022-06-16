@@ -30,10 +30,10 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @var array Settings
      */
     private $settings = [
-        'scheme'                => 'http',
-        'port'                  => 80,
-        'path'                  => '',
-        'timeout'               => 30,
+        'scheme' => 'http',
+        'port' => 80,
+        'path' => '',
+        'timeout' => 30,
     ];
 
     /**
@@ -47,7 +47,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @param string $auth_key
      * @param string $secret
      * @param string $app_id
-     * @param array $options  [optional]
+     * @param array $options [optional]
      *                         Options to configure the Pusher instance.
      *                         scheme - e.g. http or https
      *                         host - the host e.g. api-mt1.pusher.com. No trailing forward slash.
@@ -134,9 +134,9 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Log a string.
      *
-     * @param string           $msg     The message to log
+     * @param string $msg The message to log
      * @param array|\Exception $context [optional] Any extraneous information that does not fit well in a string.
-     * @param string           $level   [optional] Importance of log message, highly recommended to use Psr\Log\LogLevel::{level}
+     * @param string $level [optional] Importance of log message, highly recommended to use Psr\Log\LogLevel::{level}
      */
     private function log(string $msg, array $context = [], string $level = LogLevel::DEBUG): void
     {
@@ -270,10 +270,11 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         string $auth_secret,
         string $request_method,
         string $request_path,
-        array $query_params = [],
+        array  $query_params = [],
         string $auth_version = '1.0',
         string $auth_timestamp = null
-    ): array {
+    ): array
+    {
         $params = [];
         $params['auth_key'] = $auth_key;
         $params['auth_timestamp'] = (is_null($auth_timestamp) ? time() : $auth_timestamp);
@@ -296,9 +297,9 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * a glue, a separator between pairs and the array
      * to implode.
      *
-     * @param string       $glue      The glue between key and value
-     * @param string       $separator Separator between pairs
-     * @param array|string $array     The array to implode
+     * @param string $glue The glue between key and value
+     * @param string $separator Separator between pairs
+     * @param array|string $array The array to implode
      *
      * @return string The imploded array
      */
@@ -445,7 +446,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         $status = $response->getStatusCode();
 
         if ($status !== 200) {
-            $body = (string) $response->getBody();
+            $body = (string)$response->getBody();
             throw new ApiErrorException($body, $status);
         }
 
@@ -456,7 +457,9 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         }
 
         if (property_exists($result, 'channels')) {
-            $result->channels = get_object_vars($result->channels);
+            if (is_object($result->channels)) {
+                $result->channels = get_object_vars($result->channels);
+            }
         }
 
         return $result;
@@ -486,7 +489,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
             $status = $response->getStatusCode();
 
             if ($status !== 200) {
-                $body = (string) $response->getBody();
+                $body = (string)$response->getBody();
                 throw new ApiErrorException($body, $status);
             }
 
@@ -591,7 +594,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         $status = $response->getStatusCode();
 
         if ($status !== 200) {
-            $body = (string) $response->getBody();
+            $body = (string)$response->getBody();
             throw new ApiErrorException($body, $status);
         }
 
@@ -628,7 +631,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
             $status = $response->getStatusCode();
 
             if ($status !== 200) {
-                $body = (string) $response->getBody();
+                $body = (string)$response->getBody();
                 throw new ApiErrorException($body, $status);
             }
 
@@ -650,7 +653,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * Fetch channel information for a specific channel.
      *
      * @param string $channel The name of the channel
-     * @param array  $params  Additional parameters for the query e.g. $params = array( 'info' => 'connection_count' )
+     * @param array $params Additional parameters for the query e.g. $params = array( 'info' => 'connection_count' )
      *
      * @throws PusherException   If $channel is invalid
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
@@ -724,15 +727,15 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * GET arbitrary REST API resource using a synchronous http client.
      * All request signing is handled automatically.
      *
-     * @param string $path        Path excluding /apps/APP_ID
-     * @param array  $params      API params (see http://pusher.com/docs/rest_api)
-     * @param bool   $associative When true, return the response body as an associative array, else return as an object
+     * @param string $path Path excluding /apps/APP_ID
+     * @param array $params API params (see http://pusher.com/docs/rest_api)
+     * @param bool $associative When true, return the response body as an associative array, else return as an object
      *
-     * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
+     * @return mixed See Pusher API docs
      * @throws GuzzleException
      * @throws PusherException
      *
-     * @return mixed See Pusher API docs
+     * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      */
     public function get(string $path, array $params = [], $associative = false)
     {
@@ -755,7 +758,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         $status = $response->getStatusCode();
 
         if ($status !== 200) {
-            $body = (string) $response->getBody();
+            $body = (string)$response->getBody();
             throw new ApiErrorException($body, $status);
         }
 
@@ -856,12 +859,12 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Verify that a webhook actually came from Pusher, decrypts any encrypted events, and marshals them into a PHP object.
      *
-     * @param array  $headers a array of headers from the request (for example, from getallheaders())
-     * @param string $body    the body of the request (for example, from file_get_contents('php://input'))
-     *
-     * @throws PusherException
+     * @param array $headers a array of headers from the request (for example, from getallheaders())
+     * @param string $body the body of the request (for example, from file_get_contents('php://input'))
      *
      * @return Webhook marshalled object with the properties time_ms (an int) and events (an array of event objects)
+     * @throws PusherException
+     *
      */
     public function webhook(array $headers, string $body): object
     {
@@ -899,8 +902,8 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Verify that a given Pusher Signature is valid.
      *
-     * @param array  $headers an array of headers from the request (for example, from getallheaders())
-     * @param string $body    the body of the request (for example, from file_get_contents('php://input'))
+     * @param array $headers an array of headers from the request (for example, from getallheaders())
+     * @param string $body the body of the request (for example, from file_get_contents('php://input'))
      *
      * @throws PusherException if signature is incorrect.
      */
